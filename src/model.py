@@ -147,7 +147,7 @@ def solve_timetable(courses_df, rooms_df, professors_df, slots_df):
     # Solve
     # =========================
     solver = cp_model.CpSolver()
-    solver.parameters.max_time_in_seconds = 10
+    solver.parameters.max_time_in_seconds = 60
     status = solver.Solve(model)
 
     # =========================
