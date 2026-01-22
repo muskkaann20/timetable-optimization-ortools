@@ -1,0 +1,4 @@
+course_id,course_name,professor_id,required_sessions,enrolled_students
+C1,Data Structures,P1,3,120
+C2,Operating Systems,P2,2,60
+C3,Database Systems,P1,2,80
