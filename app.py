@@ -43,6 +43,30 @@ if courses_file and rooms_file and professors_file and slots_file:
         professors_df = pd.read_csv(professors_file)
         slots_df = pd.read_csv(slots_file)
 
+        # ==========================================
+        # 🧹 DATA CLEANING (Strip Invisible Spaces)
+        # ==========================================
+        # 1. Strip whitespace from column names
+        courses_df.columns = courses_df.columns.str.strip()
+        rooms_df.columns = rooms_df.columns.str.strip()
+        professors_df.columns = professors_df.columns.str.strip()
+        slots_df.columns = slots_df.columns.str.strip()
+
+        # 2. Strip whitespace from text data (IDs, etc.)
+        courses_df["course_id"] = courses_df["course_id"].astype(str).str.strip()
+        courses_df["professor_id"] = courses_df["professor_id"].astype(str).str.strip()
+        
+        rooms_df["room_id"] = rooms_df["room_id"].astype(str).str.strip()
+        
+        professors_df["professor_id"] = professors_df["professor_id"].astype(str).str.strip()
+        
+        # Clean the semicolon-separated list: split, strip each item, join back
+        professors_df["available_slots"] = professors_df["available_slots"].astype(str).apply(
+            lambda x: ";".join([s.strip() for s in x.split(";")])
+        )
+
+        slots_df["slot_id"] = slots_df["slot_id"].astype(str).str.strip()
+
         # -----------------------------------------------
         # VALIDATION: Check for required columns
         # -----------------------------------------------
@@ -114,6 +138,22 @@ if st.button("🚀 Generate Optimized Timetable"):
     schedule_df, metrics = solve_timetable(
         courses_df, rooms_df, professors_df, slots_df
     )
+
+    # 🛑 CHECK IF SOLUTION IS EMPTY
+    if schedule_df.empty:
+        st.error("❌ No solution found! The problem is 'Infeasible'.")
+        st.warning(
+            """
+            **Possible Causes:**
+            1. **Professor Availability:** A professor might not have enough available slots for their required sessions.
+            2. **Room Capacity:** Classes might be too large for the available rooms.
+            3. **Data Mismatch:** Check that 'professor_id' in courses.csv matches professors.csv exactly.
+            """
+        )
+        # Clear previous state so old results don't linger
+        st.session_state.schedule_df = None
+        st.session_state.metrics = None
+        st.stop()
 
     st.session_state.schedule_df = schedule_df
     st.session_state.metrics = metrics
