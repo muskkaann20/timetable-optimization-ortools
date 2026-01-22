@@ -36,10 +36,14 @@ slots_file = st.file_uploader("Upload Time Slots CSV", type=["csv"])
 # 📊 Load & Preview Data
 # =====================================
 if courses_file and rooms_file and professors_file and slots_file:
-    courses_df = pd.read_csv(courses_file)
-    rooms_df = pd.read_csv(rooms_file)
-    professors_df = pd.read_csv(professors_file)
-    slots_df = pd.read_csv(slots_file)
+    try:
+        courses_df = pd.read_csv(courses_file, encoding="utf-8", engine="python")
+        rooms_df = pd.read_csv(rooms_file, encoding="utf-8", engine="python")
+        professors_df = pd.read_csv(professors_file, encoding="utf-8", engine="python")
+        slots_df = pd.read_csv(slots_file, encoding="utf-8", engine="python")
+    except Exception:
+        st.error("❌ Invalid CSV format. Please upload valid CSV files.")
+        st.stop()
 
     st.success("✅ All input files loaded successfully")
 
@@ -59,6 +63,7 @@ else:
     st.info("⬆ Please upload all four CSV files to continue")
 
 st.markdown("---")
+
 
 # =====================================
 # 🚀 Generate Timetable
