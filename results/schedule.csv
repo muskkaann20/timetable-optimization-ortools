@@ -1,0 +1,8 @@
+course_id,course_name,professor_id,professor_name,room_id,slot_id,day,start_time
+C1,Data Structures,P1,Prof A,R1,Tue-9,Tue,09:00
+C1,Data Structures,P1,Prof A,R1,Wed-9,Wed,09:00
+C1,Data Structures,P1,Prof A,R1,Thu-9,Thu,09:00
+C2,Operating Systems,P2,Prof B,R2,Mon-11,Mon,11:00
+C2,Operating Systems,P2,Prof B,R2,Tue-9,Tue,09:00
+C3,Database Systems,P1,Prof A,R1,Mon-9,Mon,09:00
+C3,Database Systems,P1,Prof A,R1,Mon-11,Mon,11:00

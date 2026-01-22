@@ -1,0 +1,4 @@
+professor_id,professor_name,available_slots
+P1,Prof A,Mon-9;Mon-11;Tue-9;Wed-9;Thu-9
+P2,Prof B,Mon-11;Tue-9;Wed-9
+

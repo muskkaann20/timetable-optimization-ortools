@@ -1,0 +1,24 @@
+{
+  "method": "optimized",
+  "timestamp": "2026-01-22T13:40:00+05:30",
+  "dataset_summary": {
+    "num_courses": 3,
+    "num_rooms": 2,
+    "num_time_slots": 5,
+    "num_professors": 2
+  },
+  "solver": {
+    "name": "Google OR-Tools CP-SAT",
+    "objective_components": {
+      "early_slot_penalty": true,
+      "idle_gap_penalty": true,
+      "room_consistency_penalty": true
+    }
+  },
+  "metrics": {
+    "conflicts": 0,
+    "professor_idle_gaps": 0,
+    "room_switches": 0
+  },
+  "notes": "All hard constraints satisfied. Soft constraints optimized using weighted objective."
+}
