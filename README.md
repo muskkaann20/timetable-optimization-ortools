@@ -106,7 +106,7 @@ This demonstrates the effectiveness of constraint-based optimization.
 
 An interactive web interface has been built using Streamlit to visualize the optimized timetable and metrics.
 
-🔗 Live App: https://timetable-optimizer.streamlit.app
+🔗 Live App: https://timetable-optimization-ortools-nfkac3e8u3ghdekab55zgu.streamlit.app/
 
 ---
 
