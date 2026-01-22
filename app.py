@@ -23,11 +23,11 @@ if "schedule_df" not in st.session_state:
     st.session_state.metrics = None
 
 # =====================================
-# 📥 Upload Input Data
+# 📥 Upload Input Data (Formatted & Organized)
 # =====================================
 st.markdown("## 📥 Upload Input CSV Files")
 
-# --- NEW: Data Format Guide ---
+# --- UI: Data Format Guide ---
 with st.expander("ℹ️ Click to see required CSV Columns & Formats", expanded=False):
     st.markdown("""
     **Ensure your CSV files match these exact headers:**
@@ -49,30 +49,17 @@ with st.expander("ℹ️ Click to see required CSV Columns & Formats", expanded=
     * **Columns:** `slot_id`
     * *Example:* `Mon_09:00`
     """)
-    
-    # Optional: Download Sample Templates Button
-    # You could add logic here to download sample files if needed
-# ------------------------------
 
+# --- UI: Upload Buttons (2 Columns) ---
 c1, c2 = st.columns(2)
 
 with c1:
-    courses_file = st.file_uploader("Upload Courses CSV", type=["csv"], help="Required columns: course_id, professor_id, required_sessions, enrolled_students")
-    rooms_file = st.file_uploader("Upload Rooms CSV", type=["csv"], help="Required columns: room_id, capacity")
+    courses_file = st.file_uploader("Upload Courses CSV", type=["csv"], help="Required: course_id, professor_id, required_sessions, enrolled_students")
+    rooms_file = st.file_uploader("Upload Rooms CSV", type=["csv"], help="Required: room_id, capacity")
 
 with c2:
-    professors_file = st.file_uploader("Upload Professors CSV", type=["csv"], help="Required columns: professor_id, available_slots")
-    slots_file = st.file_uploader("Upload Time Slots CSV", type=["csv"], help="Required columns: slot_id")
-
-# =====================================
-# 📥 Upload Input Data
-# =====================================
-st.markdown("## 📥 Upload Input CSV Files")
-
-courses_file = st.file_uploader("Upload Courses CSV", type=["csv"])
-rooms_file = st.file_uploader("Upload Rooms CSV", type=["csv"])
-professors_file = st.file_uploader("Upload Professors CSV", type=["csv"])
-slots_file = st.file_uploader("Upload Time Slots CSV", type=["csv"])
+    professors_file = st.file_uploader("Upload Professors CSV", type=["csv"], help="Required: professor_id, available_slots")
+    slots_file = st.file_uploader("Upload Time Slots CSV", type=["csv"], help="Required: slot_id")
 
 # =====================================
 # 📊 Load & Preview Data
@@ -192,7 +179,6 @@ if st.button("🚀 Generate Optimized Timetable"):
             3. **Data Mismatch:** Check that 'professor_id' in courses.csv matches professors.csv exactly.
             """
         )
-        # Clear previous state so old results don't linger
         st.session_state.schedule_df = None
         st.session_state.metrics = None
         st.stop()
