@@ -127,11 +127,10 @@ An interactive web interface has been built using Streamlit to visualize the opt
 
 ## 🚀 Future Work
 
-- Streamlit-based interactive UI
-- Multi-objective optimization
-- Dynamic rescheduling
-- Student batch conflict modeling
-- Large-scale testing
+- Computer Vision
+- Reinforcement Learning
+- Optimization
+- Human-Computer Interaction (HCI)
 
 ---
 
