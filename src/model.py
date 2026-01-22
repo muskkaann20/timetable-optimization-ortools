@@ -138,10 +138,10 @@ def solve_timetable(courses_df, rooms_df, professors_df, slots_df):
         IDLE_GAP_WEIGHT=IDLE_GAP_WEIGHT
     )
 
-    model.Minimize(
-        model.Objective().Var()
-        + ROOM_SWITCH_WEIGHT * sum(room_switch_penalties)
-    )
+    # We sum the idle_gaps (populated by add_objective) and the room penalties
+    total_objective = sum(idle_gaps) + (ROOM_SWITCH_WEIGHT * sum(room_switch_penalties))
+    
+    model.Minimize(total_objective)
 
     # =========================
     # Solve
