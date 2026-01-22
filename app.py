@@ -37,32 +37,68 @@ slots_file = st.file_uploader("Upload Time Slots CSV", type=["csv"])
 # =====================================
 if courses_file and rooms_file and professors_file and slots_file:
     try:
-        courses_df = pd.read_csv(courses_file, encoding="utf-8", engine="python")
-        rooms_df = pd.read_csv(rooms_file, encoding="utf-8", engine="python")
-        professors_df = pd.read_csv(professors_file, encoding="utf-8", engine="python")
-        slots_df = pd.read_csv(slots_file, encoding="utf-8", engine="python")
-    except Exception:
-        st.error("❌ Invalid CSV format. Please upload valid CSV files.")
+        # Load Data
+        courses_df = pd.read_csv(courses_file)
+        rooms_df = pd.read_csv(rooms_file)
+        professors_df = pd.read_csv(professors_file)
+        slots_df = pd.read_csv(slots_file)
+
+        # -----------------------------------------------
+        # VALIDATION: Check for required columns
+        # -----------------------------------------------
+        required_columns = {
+            "courses_df": ["course_id", "professor_id", "required_sessions", "enrolled_students"],
+            "rooms_df": ["room_id", "capacity"],
+            "professors_df": ["professor_id", "available_slots"],
+            "slots_df": ["slot_id"]
+        }
+
+        # Check Courses
+        if not set(required_columns["courses_df"]).issubset(courses_df.columns):
+            st.error(f"❌ Courses CSV is missing columns. Required: {required_columns['courses_df']}")
+            st.stop()
+            
+        # Check Rooms
+        if not set(required_columns["rooms_df"]).issubset(rooms_df.columns):
+            st.error(f"❌ Rooms CSV is missing columns. Required: {required_columns['rooms_df']}")
+            st.stop()
+            
+        # Check Professors
+        if not set(required_columns["professors_df"]).issubset(professors_df.columns):
+            st.error(f"❌ Professors CSV is missing columns. Required: {required_columns['professors_df']}")
+            st.stop()
+            
+        # Check Slots
+        if not set(required_columns["slots_df"]).issubset(slots_df.columns):
+            st.error(f"❌ Slots CSV is missing columns. Required: {required_columns['slots_df']}")
+            st.stop()
+
+    except pd.errors.ParserError:
+        st.error("❌ Pandas ParserError: The files could not be parsed. Check for broken CSV structure (e.g., uneven commas).")
+        st.stop()
+    except UnicodeDecodeError:
+        st.error("❌ Encoding Error: Please save your CSV files with 'UTF-8' encoding.")
+        st.stop()
+    except Exception as e:
+        st.error(f"❌ An unexpected error occurred: {e}")
         st.stop()
 
-    st.success("✅ All input files loaded successfully")
+    st.success("✅ All input files loaded and validated successfully")
 
     with st.expander("🔍 Preview Uploaded Data"):
-        st.subheader("Courses")
-        st.dataframe(courses_df)
-
-        st.subheader("Rooms")
-        st.dataframe(rooms_df)
-
-        st.subheader("Professors")
-        st.dataframe(professors_df)
-
-        st.subheader("Time Slots")
-        st.dataframe(slots_df)
+        c1, c2 = st.columns(2)
+        with c1:
+            st.subheader("Courses")
+            st.dataframe(courses_df)
+            st.subheader("Professors")
+            st.dataframe(professors_df)
+        with c2:
+            st.subheader("Rooms")
+            st.dataframe(rooms_df)
+            st.subheader("Time Slots")
+            st.dataframe(slots_df)
 else:
     st.info("⬆ Please upload all four CSV files to continue")
-
-st.markdown("---")
 
 
 # =====================================

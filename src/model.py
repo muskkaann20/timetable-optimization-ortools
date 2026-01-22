@@ -110,7 +110,7 @@ def solve_timetable(courses_df, rooms_df, professors_df, slots_df):
         for r in rooms:
             course_uses_room[(c, r)] = model.NewBoolVar(f"course_{c}_uses_{r}")
             model.Add(
-                sum(x[(c, r, t)] for t in slots) >= course_uses_room[(c, r)]
+                sum(x[(c, r, t)] for t in slots) <= len(slots) * course_uses_room[(c, r)]
             )
 
         penalty = model.NewIntVar(0, len(rooms), f"room_switch_penalty_{c}")
