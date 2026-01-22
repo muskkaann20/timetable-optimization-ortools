@@ -3,7 +3,7 @@
 An automated university timetable optimization system built using Google OR-Tools (CP-SAT).
 This project formulates academic scheduling as a constraint optimization problem, ensuring feasibility while improving timetable quality.
 
-Author: Muskaan Manwani
+Author: Muskaan Manwanii
 
 ---
 
@@ -137,4 +137,4 @@ An interactive web interface has been built using Streamlit to visualize the opt
 ## 👤 Author
 
 Muskaan Manwanii  
-Undergraduate student with interest in optimization, AI, and real-world problem solving.
+Undergraduate BTech student with interest in optimization, AI, and real-world problem solving.
