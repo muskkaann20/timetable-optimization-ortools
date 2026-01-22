@@ -1,108 +1,126 @@
 import streamlit as st
 import pandas as pd
 import json
-import subprocess
 import os
 
-st.set_page_config(page_title="Timetable Optimizer", layout="wide")
-
-st.title("📅 Timetable Optimization System")
-st.caption("Built using OR-Tools + Streamlit")
-
-st.markdown("---")
-
-# =====================
-# Sidebar
-# =====================
-st.sidebar.header("⚙️ Controls")
-
-run_model = st.sidebar.button("🚀 Generate Optimized Timetable")
-
-st.sidebar.markdown("---")
-st.sidebar.info(
-    "This app optimizes university timetables while minimizing:\n"
-    "- Professor idle gaps\n"
-    "- Room switches\n"
-    "- Late time slots"
+# =====================================
+# Page Config
+# =====================================
+st.set_page_config(
+    page_title="Timetable Optimizer",
+    layout="wide"
 )
 
-# =====================
-# Data Preview
-# =====================
-st.subheader("📂 Input Data Preview")
+st.title("📅 Timetable Optimization System")
+st.caption("Built using Google OR-Tools (CP-SAT) + Streamlit")
+st.markdown("---")
 
-col1, col2 = st.columns(2)
+# =====================================
+# 📥 Upload Input Data
+# =====================================
+st.markdown("## 📥 Upload Input CSV Files")
 
-with col1:
-    st.markdown("### Courses")
-    courses_df = pd.read_csv("data/courses.csv")
-    st.dataframe(courses_df)
+courses_file = st.file_uploader("Upload Courses CSV", type=["csv"])
+rooms_file = st.file_uploader("Upload Rooms CSV", type=["csv"])
+professors_file = st.file_uploader("Upload Professors CSV", type=["csv"])
+slots_file = st.file_uploader("Upload Time Slots CSV", type=["csv"])
 
-with col2:
-    st.markdown("### Rooms")
-    rooms_df = pd.read_csv("data/rooms.csv")
-    st.dataframe(rooms_df)
+# =====================================
+# 📊 Load & Preview Data
+# =====================================
+if courses_file and rooms_file and professors_file and slots_file:
+    courses_df = pd.read_csv(courses_file)
+    rooms_df = pd.read_csv(rooms_file)
+    professors_df = pd.read_csv(professors_file)
+    slots_df = pd.read_csv(slots_file)
 
-st.markdown("### Time Slots")
-slots_df = pd.read_csv("data/time_slots.csv")
-st.dataframe(slots_df)
+    st.success("✅ All input files loaded successfully")
+
+    with st.expander("🔍 Preview Uploaded Data"):
+        st.subheader("Courses")
+        st.dataframe(courses_df)
+
+        st.subheader("Rooms")
+        st.dataframe(rooms_df)
+
+        st.subheader("Professors")
+        st.dataframe(professors_df)
+
+        st.subheader("Time Slots")
+        st.dataframe(slots_df)
+
+else:
+    st.info("⬆ Please upload all four CSV files to continue")
 
 st.markdown("---")
 
-# =====================
-# Run Optimization
-# =====================
-if run_model:
-    st.info("Running optimization model... ⏳")
+from src.model import solve_timetable
 
-    try:
-        subprocess.run(
-            ["python", "-m", "src.model"],
-            check=True
+
+# =====================================
+# 🚀 Generate Timetable
+# =====================================
+if st.button("🚀 Generate Optimized Timetable"):
+    if not (courses_file and rooms_file and professors_file and slots_file):
+        st.error("❌ Please upload all CSV files first")
+    else:
+        st.info("⚙️ Running optimization model...")
+
+        schedule_df, metrics = solve_timetable(
+            courses_df, rooms_df, professors_df, slots_df
         )
-        st.success("Optimization completed successfully! ✅")
-    except subprocess.CalledProcessError:
-        st.error("Error running optimization model ❌")
 
-# =====================
-# Results Section
-# =====================
-st.subheader("📊 Optimization Results")
+        st.success("✅ Timetable generated!")
 
+        st.markdown("## 📅 Optimized Timetable")
+        st.dataframe(schedule_df)
+
+        st.markdown("## 📊 Optimization Metrics")
+        c1, c2, c3 = st.columns(3)
+
+        c1.metric("Conflicts", metrics.get("conflicts", 0))
+        c2.metric("Professor Idle Gaps", metrics.get("professor_idle_gaps", 0))
+        c3.metric("Room Switches", metrics.get("room_switches", 0))
+
+
+# =====================================
+# 📅 Display Timetable
+# =====================================
 if os.path.exists("results/schedule.csv"):
+    st.markdown("## 📅 Optimized Timetable")
+
     schedule_df = pd.read_csv("results/schedule.csv")
-    st.markdown("### 🗓 Optimized Timetable")
     st.dataframe(schedule_df)
 
+    csv = schedule_df.to_csv(index=False).encode("utf-8")
     st.download_button(
-        "⬇️ Download Timetable CSV",
-        schedule_df.to_csv(index=False),
-        file_name="optimized_schedule.csv",
-        mime="text/csv"
+        "⬇ Download Timetable CSV",
+        csv,
+        "optimized_timetable.csv",
+        "text/csv"
     )
-else:
-    st.warning("Run the model to generate timetable")
 
 st.markdown("---")
 
+# =====================================
+# 📊 Optimization Metrics
+# =====================================
 if os.path.exists("results/metrics.json"):
     with open("results/metrics.json") as f:
-        metrics = json.load(f)
+        metrics_data = json.load(f)
 
-    st.markdown("### 📈 Optimization Metrics")
+    metrics = metrics_data.get("metrics", {})
 
-    m1, m2, m3 = st.columns(3)
+    st.markdown("## 📈 Optimization Metrics")
 
-    metric_data = metrics.get("metrics", {})
+    c1, c2, c3 = st.columns(3)
 
-    m1.metric("Conflicts", metric_data.get("conflicts", 0))
-    m2.metric("Professor Idle Gaps", metric_data.get("professor_idle_gaps", 0))
-    m3.metric("Room Switches", metric_data.get("room_switches", 0))
-
-
+    c1.metric("Conflicts", metrics.get("conflicts", 0))
+    c2.metric("Professor Idle Gaps", metrics.get("professor_idle_gaps", 0))
+    c3.metric("Room Switches", metrics.get("room_switches", 0))
 
 else:
-    st.warning("Metrics not available yet")
+    st.info("ℹ️ Metrics will appear after optimization")
 
 st.markdown("---")
-st.caption("© 2026 Muskaan Manwanii | Timetable Optimization using OR-Tools")
+st.caption("© 2026 Muskaan Manwani | Timetable Optimization using OR-Tools")
