@@ -27,6 +27,48 @@ if "schedule_df" not in st.session_state:
 # =====================================
 st.markdown("## 📥 Upload Input CSV Files")
 
+# --- NEW: Data Format Guide ---
+with st.expander("ℹ️ Click to see required CSV Columns & Formats", expanded=False):
+    st.markdown("""
+    **Ensure your CSV files match these exact headers:**
+    
+    1️⃣ **courses.csv**
+    * **Columns:** `course_id`, `professor_id`, `required_sessions`, `enrolled_students`
+    * *Example:* `CS101, Prof_A, 3, 50`
+    
+    2️⃣ **rooms.csv**
+    * **Columns:** `room_id`, `capacity`
+    * *Example:* `Room_101, 60`
+    
+    3️⃣ **professors.csv**
+    * **Columns:** `professor_id`, `available_slots`
+    * *Note:* Separate multiple slots with a semicolon (`;`)
+    * *Example:* `Prof_A, Mon_09:00;Mon_10:00`
+    
+    4️⃣ **slots.csv**
+    * **Columns:** `slot_id`
+    * *Example:* `Mon_09:00`
+    """)
+    
+    # Optional: Download Sample Templates Button
+    # You could add logic here to download sample files if needed
+# ------------------------------
+
+c1, c2 = st.columns(2)
+
+with c1:
+    courses_file = st.file_uploader("Upload Courses CSV", type=["csv"], help="Required columns: course_id, professor_id, required_sessions, enrolled_students")
+    rooms_file = st.file_uploader("Upload Rooms CSV", type=["csv"], help="Required columns: room_id, capacity")
+
+with c2:
+    professors_file = st.file_uploader("Upload Professors CSV", type=["csv"], help="Required columns: professor_id, available_slots")
+    slots_file = st.file_uploader("Upload Time Slots CSV", type=["csv"], help="Required columns: slot_id")
+
+# =====================================
+# 📥 Upload Input Data
+# =====================================
+st.markdown("## 📥 Upload Input CSV Files")
+
 courses_file = st.file_uploader("Upload Courses CSV", type=["csv"])
 rooms_file = st.file_uploader("Upload Rooms CSV", type=["csv"])
 professors_file = st.file_uploader("Upload Professors CSV", type=["csv"])
