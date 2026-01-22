@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
-import json
-import os
+
+from src.model import solve_timetable
 
 # =====================================
 # Page Config
@@ -14,6 +14,13 @@ st.set_page_config(
 st.title("📅 Timetable Optimization System")
 st.caption("Built using Google OR-Tools (CP-SAT) + Streamlit")
 st.markdown("---")
+
+# =====================================
+# Session State Init
+# =====================================
+if "schedule_df" not in st.session_state:
+    st.session_state.schedule_df = None
+    st.session_state.metrics = None
 
 # =====================================
 # 📥 Upload Input Data
@@ -48,14 +55,10 @@ if courses_file and rooms_file and professors_file and slots_file:
 
         st.subheader("Time Slots")
         st.dataframe(slots_df)
-
 else:
     st.info("⬆ Please upload all four CSV files to continue")
 
 st.markdown("---")
-
-from src.model import solve_timetable
-
 
 # =====================================
 # 🚀 Generate Timetable
@@ -63,36 +66,27 @@ from src.model import solve_timetable
 if st.button("🚀 Generate Optimized Timetable"):
     if not (courses_file and rooms_file and professors_file and slots_file):
         st.error("❌ Please upload all CSV files first")
-    else:
-        st.info("⚙️ Running optimization model...")
+        st.stop()
 
-        schedule_df, metrics = solve_timetable(
-            courses_df, rooms_df, professors_df, slots_df
-        )
+    st.info("⚙️ Running optimization model...")
 
-        st.success("✅ Timetable generated!")
+    schedule_df, metrics = solve_timetable(
+        courses_df, rooms_df, professors_df, slots_df
+    )
 
-        st.markdown("## 📅 Optimized Timetable")
-        st.dataframe(schedule_df)
+    st.session_state.schedule_df = schedule_df
+    st.session_state.metrics = metrics
 
-        st.markdown("## 📊 Optimization Metrics")
-        c1, c2, c3 = st.columns(3)
-
-        c1.metric("Conflicts", metrics.get("conflicts", 0))
-        c2.metric("Professor Idle Gaps", metrics.get("professor_idle_gaps", 0))
-        c3.metric("Room Switches", metrics.get("room_switches", 0))
-
+    st.success("✅ Timetable generated successfully!")
 
 # =====================================
-# 📅 Display Timetable
+# 📅 Display Timetable (ONLY after run)
 # =====================================
-if os.path.exists("results/schedule.csv"):
+if st.session_state.schedule_df is not None:
     st.markdown("## 📅 Optimized Timetable")
+    st.dataframe(st.session_state.schedule_df)
 
-    schedule_df = pd.read_csv("results/schedule.csv")
-    st.dataframe(schedule_df)
-
-    csv = schedule_df.to_csv(index=False).encode("utf-8")
+    csv = st.session_state.schedule_df.to_csv(index=False).encode("utf-8")
     st.download_button(
         "⬇ Download Timetable CSV",
         csv,
@@ -100,27 +94,23 @@ if os.path.exists("results/schedule.csv"):
         "text/csv"
     )
 
-st.markdown("---")
-
 # =====================================
 # 📊 Optimization Metrics
 # =====================================
-if os.path.exists("results/metrics.json"):
-    with open("results/metrics.json") as f:
-        metrics_data = json.load(f)
-
-    metrics = metrics_data.get("metrics", {})
-
-    st.markdown("## 📈 Optimization Metrics")
+if st.session_state.metrics is not None:
+    st.markdown("## 📊 Optimization Metrics")
 
     c1, c2, c3 = st.columns(3)
 
-    c1.metric("Conflicts", metrics.get("conflicts", 0))
-    c2.metric("Professor Idle Gaps", metrics.get("professor_idle_gaps", 0))
-    c3.metric("Room Switches", metrics.get("room_switches", 0))
-
-else:
-    st.info("ℹ️ Metrics will appear after optimization")
+    c1.metric("Conflicts", st.session_state.metrics.get("conflicts", 0))
+    c2.metric(
+        "Professor Idle Gaps",
+        st.session_state.metrics.get("professor_idle_gaps", 0)
+    )
+    c3.metric(
+        "Room Switches",
+        st.session_state.metrics.get("room_switches", 0)
+    )
 
 st.markdown("---")
-st.caption("© 2026 Muskaan Manwani | Timetable Optimization using OR-Tools")
+st.caption("© 2026 Muskaan Manwanii | Timetable Optimization using OR-Tools")

@@ -1,10 +1,8 @@
 from ortools.sat.python import cp_model
 import pandas as pd
-import json
 
 from src.objective import add_objective
 from src.utils import compute_metrics
-
 
 
 def solve_timetable(courses_df, rooms_df, professors_df, slots_df):
@@ -177,25 +175,3 @@ def solve_timetable(courses_df, rooms_df, professors_df, slots_df):
     metrics = compute_metrics(schedule)
 
     return schedule_df, metrics
-
-
-# ==================================================
-# Optional: CLI usage (keeps backward compatibility)
-# ==================================================
-if __name__ == "__main__":
-    courses_df = pd.read_csv("data/courses.csv")
-    rooms_df = pd.read_csv("data/rooms.csv")
-    professors_df = pd.read_csv("data/professors.csv")
-    slots_df = pd.read_csv("data/time_slots.csv")
-
-    schedule_df, metrics = solve_timetable(
-        courses_df, rooms_df, professors_df, slots_df
-    )
-
-    schedule_df.to_csv("results/schedule.csv", index=False)
-
-    with open("results/metrics.json", "w") as f:
-        json.dump({"metrics": metrics}, f, indent=2)
-
-    print("✅ Timetable generated")
-    print("📊 Metrics:", metrics)
