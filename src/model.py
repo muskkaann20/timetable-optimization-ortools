@@ -2,8 +2,9 @@ from ortools.sat.python import cp_model
 import pandas as pd
 import json
 
-from objective import add_objective
-from utils import compute_metrics
+from src.objective import add_objective
+from src.utils import compute_metrics
+
 
 
 def solve_timetable(courses_df, rooms_df, professors_df, slots_df):
